@@ -1,0 +1,30 @@
+#!/usr/bin/env ruby
+
+require 'carbios'
+require 'optparse'
+require 'logger'
+require 'yaml'
+require 'pp'
+require 'graphite/logger'
+
+logger = Logger.new($stdout)
+logger.level = Logger::WARN
+
+options = { :configfile => 'config/carbios.sample.yaml' }
+
+config = { :reverse_hostname => true,
+           :graphite_host    => 'tv.borg.lan',
+           :graphite_port    => 2003 }
+
+config.merge! YAML.load_file(options[:configfile])
+
+g = Graphite::Logger.new("#{config[:graphite_host]}:#{config[:graphite_port]}", 
+                         logger)
+ARGF.each do |str|
+  perfdata = Carbios::PerfData.new(str, :base_hostname => /\.ideeli\.(net|com)$/, 
+                                        :prefix => "perfdata")
+  logger.debug str
+  logger.debug "time => #{perfdata.time.to_i}"
+  logger.debug "perfdata => #{perfdata.to_h.inspect}"
+  g.log(perfdata.time.to_i, perfdata.to_h) if perfdata.has_perfdata?
+end
