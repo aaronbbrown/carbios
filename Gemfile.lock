@@ -1,0 +1,22 @@
+PATH
+  remote: .
+  specs:
+    carbios (0.0.1)
+      graphite
+
+GEM
+  remote: http://rubygems.org/
+  specs:
+    eventmachine (1.0.0)
+    graphite (0.2.0)
+      eventmachine
+      rufus-scheduler
+    rufus-scheduler (2.0.17)
+      tzinfo (>= 0.3.23)
+    tzinfo (0.3.33)
+
+PLATFORMS
+  ruby
+
+DEPENDENCIES
+  carbios!
