@@ -57,6 +57,7 @@ end
 
 # clean up
 files.each do |filename|
+  next if filename == '-'
   begin
     if config[:archive]
       newfn = "#{filename}.#{Time.new.strftime('%Y%m%d%H%M%S')}"
