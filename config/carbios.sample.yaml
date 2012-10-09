@@ -1,0 +1,34 @@
+--- 
+# base_hostname is a regular expression that is removed
+# from the hostname field in the graphite metric.
+# Example:
+#   :base_hostname: !ruby/regexp /\.ideeli\.(net|com)$/
+#   hostname = "foo.bar.ideeli.net"
+#   metric   = "loadavg"
+#     => "bar.foo.loadavg"
+:base_hostname: !ruby/regexp /\.ideeli\.(net|com)$/
+
+# reverse_hostname will make the hostname appear in
+# reverse domain order in the graphite metric name
+# Example:
+#   hostname = "foo.bar.ideeli.net"
+#   metric   = "loadavg"
+#     => "net.ideeli.bar.foo.loadavg"
+:reverse_hostname: true
+
+:graphite_host: tv.borg.lan
+:graphite_port: 2003
+
+# prefix adds a prefix to the graphite metric name
+# Example:
+#   hostname = "foo.bar.ideeli.net"
+#   metric   = "loadavg"
+#   prefix   = "perfdata"
+#     => "perfdata.net.ideeli.bar.foo.loadavg"
+:prefix: perfdata
+
+# if archive is true, the perfdata files will be renamed
+# with a timestamp extension after being processed
+#
+# if archive is false, the perfdata files WILL BE REMOVED
+:archive: true

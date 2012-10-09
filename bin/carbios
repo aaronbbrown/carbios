@@ -7,24 +7,66 @@ require 'yaml'
 require 'pp'
 require 'graphite/logger'
 
+
 logger = Logger.new($stdout)
 logger.level = Logger::WARN
 
-options = { :configfile => 'config/carbios.sample.yaml' }
-
 config = { :reverse_hostname => true,
-           :graphite_host    => 'tv.borg.lan',
-           :graphite_port    => 2003 }
+           :prefix           => 'perfdata',
+           :graphite_host    => 'localhost',
+           :graphite_port    => 2003,
+           :archive          => true, }
+
+options = {}
+opts = OptionParser.new
+opts.banner = "Usage #{$0} --config FILE FILES"
+opts.on("-c", "--config FILE", String,  "Config file" ) do |v|
+  options[:configfile] = v
+end
+opts.on("-h", "--help", "help" ) do |v|
+  puts opts
+  exit 1
+end
+opts.on("-d", "--debug", "Turn on debug logging" ) do |v|
+  logger.level = Logger::DEBUG
+end
+opts.parse!
+
+unless options[:configfile] && File.file?(options[:configfile])
+  logger.fatal "Must specify --config FILE"
+  puts opts
+  exit 1
+end
 
 config.merge! YAML.load_file(options[:configfile])
 
 g = Graphite::Logger.new("#{config[:graphite_host]}:#{config[:graphite_port]}", 
                          logger)
+files = []
 ARGF.each do |str|
-  perfdata = Carbios::PerfData.new(str, :base_hostname => /\.ideeli\.(net|com)$/, 
-                                        :prefix => "perfdata")
+  perfdata = Carbios::PerfData.new(str, :base_hostname    => config[:base_hostname],
+                                        :prefix           => config[:prefix],
+                                        :reverse_hostname => config[:reverse_hostname] )
   logger.debug str
   logger.debug "time => #{perfdata.time.to_i}"
   logger.debug "perfdata => #{perfdata.to_h.inspect}"
   g.log(perfdata.time.to_i, perfdata.to_h) if perfdata.has_perfdata?
+
+  files << ARGF.filename unless files.include? ARGF.filename
+end
+
+# clean up
+files.each do |filename|
+  begin
+    if config[:archive]
+      newfn = "#{filename}.#{Time.new.strftime('%Y%m%d%H%M%S')}"
+      logger.info "Renaming #{filename} to #{newfn}"
+      File.rename(filename, newfn)
+    else
+      logger.info "Removing #{filename}"
+      File.unlink(filename) if File.file? filename
+    end
+  rescue
+    logger.error "Unable to remove or rename #{filename}" 
+  end
 end

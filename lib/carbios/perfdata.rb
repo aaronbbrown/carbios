@@ -13,8 +13,9 @@ class PerfData
     parse_checkdata(checkstr)
     @time      = Time.at(@checkdata['TIMET'].to_i)
     @hostname  = Hostname.new( @checkdata['HOSTNAME'], 
-                               :base_hostname => options[:base_hostname] )
+                               :base_hostname    => options[:base_hostname] )
     @desc      = normalize_key(@checkdata['SERVICEDESC']) if @checkdata['SERVICEDESC']
+    @reverse_hostname = options[:reverse_hostname]
     parse_perfdata
   end
 
@@ -42,7 +43,8 @@ class PerfData
   end
 
   def to_h
-    prefix = [@prefix,@hostname.reverse,@desc].compact.join('.')
+    hostname = @reverse_hostname ? @hostname.reverse : @hostname
+    prefix = [@prefix, hostname, @desc].compact.join('.')
     normalize_perfdata.prefix_keys("#{prefix}.")
   end
 

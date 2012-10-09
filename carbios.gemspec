@@ -7,9 +7,9 @@ Gem::Specification.new do |s|
   s.version     = Carbios::VERSION
   s.authors     = ["Aaron Brown"]
   s.email       = ["abrown@ideeli.com"]
-  s.homepage    = ""
-  s.summary     = %q{TODO: Write a gem summary}
-  s.description = %q{TODO: Write a gem description}
+  s.homepage    = "https://github.com/ideeli/carbios"
+  s.summary     = %q{Nagios perfdata to Graphite/Carbon connector}
+  s.description = %q{Nagios perfdata to Graphite/Carbon connector}
 
   s.rubyforge_project = "carbios"
 
