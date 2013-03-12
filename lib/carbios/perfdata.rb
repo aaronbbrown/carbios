@@ -31,7 +31,7 @@ class PerfData
     else
       raise "Cannot find #{SERVICEKEY} or #{HOSTKEY} keys"
     end
-    @perfdata = Hash[@checkdata[@key].scan(/(\S+)=(\d+(?:\.\d+)?)\S*\s?/)]
+    @perfdata = Hash[@checkdata[@key].scan(/(\S+)=(-?\d+(?:\.\d+)?)\S*\s?/)]
   end
 
   def normalize_perfdata
